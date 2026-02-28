@@ -25,8 +25,8 @@ export async function POST(
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Notify Make.com webhook 2 with all fields
-  const webhookUrl = process.env.MAKE_WEBHOOK_2_URL
+  // Notify n8n webhook with all fields for Clio sync
+  const webhookUrl = process.env.N8N_APPROVE_WEBHOOK_URL
   if (webhookUrl) {
     await fetch(webhookUrl, {
       method: 'POST',

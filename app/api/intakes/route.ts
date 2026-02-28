@@ -59,12 +59,14 @@ export async function POST(req: NextRequest) {
 
     // Notify n8n webhook
     const webhookUrl = process.env.N8N_WEBHOOK_URL
+    console.log('[intake] N8N_WEBHOOK_URL:', webhookUrl ?? 'NOT SET')
     if (webhookUrl) {
-      await fetch(webhookUrl, {
+      const webhookRes = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pdf_url: publicUrl, intake_id: intake.id }),
       })
+      console.log('[intake] webhook response:', webhookRes.status)
     }
 
     return NextResponse.json({ intake_id: intake.id })
