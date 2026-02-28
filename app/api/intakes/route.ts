@@ -9,7 +9,9 @@ export async function GET() {
     .order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+  return NextResponse.json(data, {
+    headers: { 'Cache-Control': 'no-store' },
+  })
 }
 
 // POST /api/intakes/upload — paralegal uploads PDF
@@ -55,8 +57,8 @@ export async function POST(req: NextRequest) {
       .update({ pdf_url: publicUrl, status: 'Extracting' })
       .eq('id', intake.id)
 
-    // Notify Make.com webhook 1
-    const webhookUrl = process.env.MAKE_WEBHOOK_1_URL
+    // Notify n8n webhook
+    const webhookUrl = process.env.N8N_WEBHOOK_URL
     if (webhookUrl) {
       await fetch(webhookUrl, {
         method: 'POST',
