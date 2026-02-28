@@ -19,7 +19,8 @@ export function getSupabaseAdmin(): SupabaseClient {
   if (!_supabaseAdmin) {
     _supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SECRET_KEY!
+      process.env.SUPABASE_SECRET_KEY!,
+      { global: { fetch: (url, options) => fetch(url, { ...options, cache: 'no-store' }) } }
     )
   }
   return _supabaseAdmin
