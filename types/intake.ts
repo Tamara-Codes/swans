@@ -6,6 +6,7 @@ export type IntakeStatus =
   | 'Approved'
   | 'Sent'
   | 'Rejected'
+  | 'Failed'
 
 export type BodilyInjuryOption = 'Yes' | 'No' | 'Needs Review'
 

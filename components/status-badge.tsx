@@ -11,6 +11,7 @@ const statusConfig: Record<IntakeStatus, { label: string; className: string }> =
   Approved: { label: 'Approved', className: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   Sent: { label: 'Sent', className: 'bg-green-50 text-green-700 border-green-200' },
   Rejected: { label: 'Rejected', className: 'bg-red-50 text-red-600 border-red-200' },
+  Failed: { label: 'Failed', className: 'bg-red-100 text-red-700 border-red-300' },
 }
 
 export function StatusBadge({ status }: { status: IntakeStatus }) {
