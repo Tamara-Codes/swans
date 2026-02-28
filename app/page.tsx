@@ -16,7 +16,7 @@ export default function DashboardPage() {
 
   const fetchIntakes = useCallback(async () => {
     try {
-      const res = await fetch('/api/intakes')
+      const res = await fetch('/api/intakes', { cache: 'no-store' })
       if (res.ok) setIntakes(await res.json())
     } finally {
       setLoading(false)

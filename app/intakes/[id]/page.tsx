@@ -50,7 +50,7 @@ export default function IntakeReviewPage({ params }: { params: { id: string } })
   const scheduling = getSchedulingLink()
 
   const fetchIntake = useCallback(async () => {
-    const res = await fetch(`/api/intakes/${params.id}`)
+    const res = await fetch(`/api/intakes/${params.id}`, { cache: 'no-store' })
     if (!res.ok) return
     const data: Intake = await res.json()
     setIntake(data)
