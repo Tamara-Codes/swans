@@ -15,7 +15,7 @@ export function EmailPreview({ intake }: EmailPreviewProps) {
   const scheduling = getSchedulingLink()
   const firstName = getClientFirstName(intake.client_name ?? null)
   const accidentDate = formatDate(intake.date_of_accident ?? null)
-  const description = intake.accident_description ?? ''
+  const description = intake.email_description ?? intake.accident_description ?? ''
   const showBodilyInjury = intake.use_bodily_injury_paragraph === 'Yes'
   const clientName = intake.client_name ?? 'Client Name'
 

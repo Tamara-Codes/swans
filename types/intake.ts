@@ -26,6 +26,7 @@ export interface Intake {
   injury_flag: boolean
   use_bodily_injury_paragraph: BodilyInjuryOption | null
   accident_description: string | null
+  email_description: string | null
   statute_of_limitations_date: string | null
   notes: string | null
   uploaded_at: string
