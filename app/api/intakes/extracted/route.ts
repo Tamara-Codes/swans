@@ -17,6 +17,8 @@ export async function POST(req: NextRequest) {
     // Generate client-facing email description before saving
     let email_description: string | null = null
     const geminiKey = process.env.GEMINI_API_KEY
+    console.log('[extracted] geminiKey present:', !!geminiKey)
+    console.log('[extracted] accident_description:', fields.accident_description)
     if (fields.accident_description && geminiKey) {
       try {
         const geminiRes = await fetch(
@@ -34,9 +36,11 @@ export async function POST(req: NextRequest) {
           }
         )
         const geminiData = await geminiRes.json()
+        console.log('[extracted] gemini response:', JSON.stringify(geminiData))
         email_description = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? null
-      } catch {
-        // Non-fatal — email preview will fall back to raw description
+        console.log('[extracted] email_description:', email_description)
+      } catch (err) {
+        console.error('[extracted] gemini error:', err)
       }
     }
 
