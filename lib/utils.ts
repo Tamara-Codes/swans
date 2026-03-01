@@ -47,7 +47,17 @@ export function getSchedulingLink(): { url: string; label: string; reason: strin
 
 export function getClientFirstName(fullName: string | null): string {
   if (!fullName) return 'Client'
-  return fullName.split(' ')[0]
+  const clean = fullName.replace(/[,;]+/g, '').trim()
+  return clean.split(/\s+/)[0].charAt(0).toUpperCase() + clean.split(/\s+/)[0].slice(1).toLowerCase()
+}
+
+export function formatClientName(fullName: string | null): string {
+  if (!fullName) return 'Client'
+  const clean = fullName.replace(/[,;]+/g, '').trim()
+  return clean
+    .split(/\s+/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
 }
 
 export function estimatedHoursSaved(count: number): string {
