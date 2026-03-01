@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
               contents: [{
                 parts: [{
-                  text: `Rewrite the following accident description in 2-3 sentences from the client's perspective for a warm attorney email. Use "you" and "your vehicle" instead of the client's name. If there is a disputed version of events, mention it briefly. Do not include any intro or explanation, just the rewritten text.\n\nRaw description: ${fields.accident_description}`
+                  text: `You are writing a sentence for a client email from their attorney. Rewrite the accident description below in first person, addressing the client directly as "you". Never use "Vehicle 1" or "Vehicle 2" or the client's name — always say "you", "your vehicle", "the other driver", or "their vehicle". If there is a disputed version of events, mention it briefly. Output only the rewritten sentence(s), no intro, no explanation.\n\nAccident description: ${fields.accident_description}`
                 }]
               }]
             })
