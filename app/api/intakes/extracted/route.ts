@@ -22,14 +22,14 @@ export async function POST(req: NextRequest) {
     if (fields.accident_description && geminiKey) {
       try {
         const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{
                 parts: [{
-                  text: `Rewrite the accident description for a client email from their attorney. Rules: never use "Vehicle 1", "Vehicle 2", or the client's name. Always use "you"/"your vehicle" for the client and "the other driver"/"their vehicle" for the other party. If there is a dispute, mention it. Output only the rewritten text.\n\nExample input: Vehicle 1, driven by John Smith, was stopped at a red light when Vehicle 2 rear-ended Vehicle 1. Vehicle 2 claims Vehicle 1 reversed into them.\nExample output: You were stopped at a red light when the other driver rear-ended your vehicle. The other driver is claiming you reversed into them, which we will dispute.\n\nNow rewrite this:\n${fields.accident_description}`
+                  text: `Rewrite the accident description for a client email from their attorney. Rules: never use "Vehicle 1", "Vehicle 2", or the client's name. Always use "you"/"your vehicle" for the client and "the other driver"/"their vehicle" for the other party. If there is a dispute, mention it. End with: "We know that these types of collisions can be disruptive, but I want to reassure you that we are here to advocate for you and handle the legal process as smoothly as possible." Output only the rewritten text.\n\nExample input: Vehicle 1, driven by John Smith, was stopped at a red light when Vehicle 2 rear-ended Vehicle 1. Vehicle 2 claims Vehicle 1 reversed into them.\nExample output: You were stopped at a red light when the other driver rear-ended your vehicle. The other driver is claiming you reversed into them, which we will dispute. We know that these types of collisions can be disruptive, but I want to reassure you that we are here to advocate for you and handle the legal process as smoothly as possible.\n\nNow rewrite this:\n${fields.accident_description}`
                 }]
               }]
             })
