@@ -14,6 +14,32 @@ export async function POST(req: NextRequest) {
 
     const status = fields.clio_flagged ? 'Flagged' : 'Review'
 
+    // Generate client-facing email description before saving
+    let email_description: string | null = null
+    const geminiKey = process.env.GEMINI_API_KEY
+    if (fields.accident_description && geminiKey) {
+      try {
+        const geminiRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: `Rewrite the following accident description in 2-3 sentences from the client's perspective for a warm attorney email. Use "you" and "your vehicle" instead of the client's name. If there is a disputed version of events, mention it briefly. Do not include any intro or explanation, just the rewritten text.\n\nRaw description: ${fields.accident_description}`
+                }]
+              }]
+            })
+          }
+        )
+        const geminiData = await geminiRes.json()
+        email_description = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? null
+      } catch {
+        // Non-fatal — email preview will fall back to raw description
+      }
+    }
+
     const { error } = await supabaseAdmin
       .from('intakes')
       .update({
@@ -31,44 +57,13 @@ export async function POST(req: NextRequest) {
         use_bodily_injury_paragraph: fields.use_bodily_injury_paragraph,
         accident_description: fields.accident_description,
         statute_of_limitations_date: fields.statute_of_limitations_date,
+        email_description,
         extracted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq('id', intake_id)
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-
-    // Generate client-facing email description
-    if (fields.accident_description) {
-      try {
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{
-                parts: [{
-                  text: `Rewrite the following accident description in 2-3 sentences from the client's perspective for a warm attorney email. Use "you" and "your vehicle" instead of the client's name. If there is a disputed version of events, mention it briefly. Do not include any intro or explanation, just the rewritten text.
-
-Raw description: ${fields.accident_description}`
-                }]
-              }]
-            })
-          }
-        )
-        const geminiData = await geminiRes.json()
-        const emailDescription = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
-        if (emailDescription) {
-          await supabaseAdmin
-            .from('intakes')
-            .update({ email_description: emailDescription })
-            .eq('id', intake_id)
-        }
-      } catch {
-        // Non-fatal — email preview will fall back to raw description
-      }
-    }
 
     return NextResponse.json({ success: true, status })
   } catch {
