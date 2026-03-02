@@ -24,10 +24,9 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card'
-import { estimatedHoursSaved } from '@/lib/utils'
 import type { Intake } from '@/types/intake'
 import { format, parseISO, isSameMonth } from 'date-fns'
-import { TrendingUp, Clock, AlertTriangle, FileText } from 'lucide-react'
+import { AlertTriangle, FileText } from 'lucide-react'
 
 function getThisMonthIntakes(intakes: Intake[]) {
   const now = new Date()
@@ -36,17 +35,6 @@ function getThisMonthIntakes(intakes: Intake[]) {
   })
 }
 
-function averageSpeedToLead(intakes: Intake[]): string {
-  const sent = intakes.filter((i) => i.status === 'Sent' && i.sent_at)
-  if (!sent.length) return '—'
-  const avg = sent.reduce((acc, i) => {
-    return acc + (new Date(i.sent_at!).getTime() - new Date(i.uploaded_at).getTime())
-  }, 0) / sent.length
-  const totalSeconds = Math.floor(avg / 1000)
-  const mins = Math.floor(totalSeconds / 60)
-  const secs = totalSeconds % 60
-  return `${mins}m ${secs}s`
-}
 
 function getMonthlyData(intakes: Intake[]) {
   const counts: Record<string, number> = {}
@@ -72,9 +60,6 @@ const injuryChartConfig: ChartConfig = {
 
 export function AnalyticsSection({ intakes }: { intakes: Intake[] }) {
   const thisMonth = getThisMonthIntakes(intakes)
-  const sentThisMonth = thisMonth.filter((i) => i.status === 'Sent')
-  const avgSpeed = averageSpeedToLead(intakes)
-  const hoursSaved = estimatedHoursSaved(sentThisMonth.length)
   const flaggedCount = intakes.filter((i) => i.injury_flag || i.status === 'Flagged').length
 
   // Funnel
@@ -104,18 +89,6 @@ export function AnalyticsSection({ intakes }: { intakes: Intake[] }) {
       sub: 'total received',
     },
     {
-      label: 'Avg Speed-to-Lead',
-      value: avgSpeed,
-      icon: Clock,
-      sub: 'upload → sent',
-    },
-    {
-      label: 'Est. Hours Saved',
-      value: hoursSaved,
-      icon: TrendingUp,
-      sub: `${sentThisMonth.length} sent × 45 min`,
-    },
-    {
       label: 'Flagged for Review',
       value: flaggedCount.toString(),
       icon: AlertTriangle,
@@ -128,7 +101,7 @@ export function AnalyticsSection({ intakes }: { intakes: Intake[] }) {
       <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Analytics</h2>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {kpis.map((kpi) => {
           const Icon = kpi.icon
           return (
